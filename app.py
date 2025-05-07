@@ -4,7 +4,13 @@ import requests
 import os  # Added for potential environment variable usage
 
 app = Flask(__name__)
-CORS(app)  # Autorise les requêtes CORS (frontend → backend)
+CORS(app, resources={
+    r"/api/*": {
+        "origins": ["https://jylstheproducer.github.io"],
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }
+})  # Configuration CORS spécifique pour GitHub Pages
 
 # Fix 1: Added quotes around the API token
 HUGGINGFACE_API_TOKEN = "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"
