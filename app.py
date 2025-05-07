@@ -5,7 +5,7 @@ import os
 
 app = Flask(__name__)
 
-# Autoriser uniquement GitHub Pages
+# Autoriser uniquement le frontend sur GitHub Pages
 CORS(app, resources={
     r"/api/*": {
         "origins": ["https://jylstheproducer.github.io"],
@@ -14,36 +14,39 @@ CORS(app, resources={
     }
 })
 
-HUGGINGFACE_API_TOKEN = "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"
+# Clé API Hugging Face depuis variable d'environnement
+HUGGINGFACE_API_TOKEN = os.getenv("HUGGINGFACE_API_TOKEN", "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")
 
 def ask_huggingface(question):
     url = "https://api-inference.huggingface.co/models/google/flan-t5-small"
     headers = {
         "Authorization": f"Bearer {HUGGINGFACE_API_TOKEN}"
     }
-    payload = {
-        "inputs": question
-    }
+    payload = {"inputs": question}
+
     try:
-        response = requests.post(url, headers=headers, json=payload)
+        response = requests.post(url, headers=headers, json=payload, timeout=10)
         result = response.json()
 
         if isinstance(result, list):
-            return result[0].get("generated_text", "No answer found")
-        elif isinstance(result, dict):
-            if "error" in result:
-                return f"Model is loading: {result.get('estimated_time', 0):.1f}s remaining"
-            return result.get("generated_text", "No answer found")
-        return "Unexpected response format"
+            return result[0].get("generated_text", "Aucune réponse générée.")
+        elif "error" in result:
+            # Gestion du temps de chargement du modèle
+            if "estimated_time" in result:
+                return f"Le modèle se charge. Veuillez patienter environ {result['estimated_time']:.1f} secondes."
+            return "Erreur du modèle : " + result["error"]
+        else:
+            return result.get("generated_text", "Format de réponse inattendu.")
     except Exception as e:
-        print(f"Error: {str(e)}")
-        return "Je suis désolé, une erreur est survenue."
+        print(f"Erreur Hugging Face : {str(e)}")
+        return "Je suis désolé, une erreur est survenue lors de la connexion au modèle."
 
-# Route principale du chatbot
+# Route API principale
 @app.route('/api/chat', methods=['POST'])
 def chat():
     data = request.get_json()
-    message = data.get("message", "")
+    message = data.get("message", "").strip()
+
     if not message:
         return jsonify({"status": "error", "response": "Message vide."}), 400
 
@@ -56,3 +59,4 @@ if __name__ == "__main__":
         port=int(os.environ.get("PORT", 10000)),
         debug=False
     )
+
