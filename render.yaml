@@ -5,5 +5,5 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: python app.py
     envVars:
-      - key: HUGGINGFACE_API_TOKEN
+      - key: "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"
         sync: false
