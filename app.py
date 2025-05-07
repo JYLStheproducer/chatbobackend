@@ -5,7 +5,7 @@ import os
 
 app = Flask(__name__)
 
-# Configuration CORS autorisant GitHub Pages uniquement
+# Autoriser uniquement GitHub Pages
 CORS(app, resources={
     r"/api/*": {
         "origins": ["https://jylstheproducer.github.io"],
@@ -39,11 +39,9 @@ def ask_huggingface(question):
         print(f"Error: {str(e)}")
         return "Je suis désolé, une erreur est survenue."
 
-@app.route('/api/chat', methods=['POST', 'OPTIONS'])
+# Route principale du chatbot
+@app.route('/api/chat', methods=['POST'])
 def chat():
-    if request.method == 'OPTIONS':
-        return jsonify({"status": "ok"}), 200  # Répondre aux requêtes de preflight
-
     data = request.get_json()
     message = data.get("message", "")
     if not message:
@@ -58,4 +56,3 @@ if __name__ == "__main__":
         port=int(os.environ.get("PORT", 10000)),
         debug=False
     )
-
