@@ -12,8 +12,6 @@ CORS(app, resources={
         "allow_headers": ["Content-Type", "Authorization"]
     }
 })  # Configuration CORS spécifique pour GitHub Pages
-=======
->>>>>>> 755b96a9659ed07ba1d87cc6c8c71b1b1a051945
 
 # Autoriser uniquement le frontend sur GitHub Pages
 CORS(app, resources={
@@ -66,13 +64,11 @@ def chat():
 if __name__ == "__main__":
     app.run(
         host='0.0.0.0',
-<<<<<<< HEAD
         port=int(os.environ.get("PORT", 10000)),  # More deployment-friendly
         debug=False  # Important for production
     )
-=======
         port=int(os.environ.get("PORT", 10000)),
         debug=False
     )
 
->>>>>>> 755b96a9659ed07ba1d87cc6c8c71b1b1a051945
+
